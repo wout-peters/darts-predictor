@@ -30,17 +30,21 @@ def getLinks(url, years, categories):
     browser.quit()
     return dataLinks
 
-
 #Use web scraper to get dataframe with matches and results
-#Perhaps use 
-matches = pd.DataFrame(columns=['year','event','location','date','round','player1','player2','score1','score2'])
+#Perhaps use previous winners?
+def getData(URLs):
+    matches = pd.DataFrame(columns=['year','event','location','date','round','player1','player2','score1','score2'])
+    year = None
 
-for URL in dataLinks:
-    page = requests.get(URL)
-    soup = BeautifulSoup(page.content, "html.parser")
-    year_element = soup.select_one('select[name="ctl00$mainContentPlaceHolder$cboYear"]')
-    year = year_element.get('value')
-    print(year)
+    for URL in URLs:
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        year_element = soup.find(id='mainContentPlaceHolder_cboYear')
+        year_selected = year_element.select('[selected]')
+        for years in year_selected:
+            year = years
+    
+    
 
 
 def main():
@@ -51,6 +55,7 @@ def main():
     years = ['1','2','3','4','5','6']
     categories = ['2','3','4','5']
     URLs = getLinks('https://clickondarts.com/DartsStats.aspx',years,categories)
+    df = getData(URLs)
 
 
 if __name__ == "__main__":
