@@ -14,6 +14,8 @@ def getLinks(url, years, categories):
     dataLinks = []
     browser.get(url)
 
+    browser.delete_all_cookies()
+
     for year in years:
         browser.find_element(By.XPATH, '//*[@id="mainContentPlaceHolder_cboYear"]/option['+year+']').click()
         for cat in categories:
@@ -32,19 +34,34 @@ def getLinks(url, years, categories):
 
 #Use web scraper to get dataframe with matches and results
 #Perhaps use previous winners?
-def getData(URLs):
+def getData(URL):
     matches = pd.DataFrame(columns=['year','event','location','date','round','player1','player2','score1','score2'])
-    year = None
 
-    for URL in URLs:
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, "html.parser")
-        year_element = soup.find(id='mainContentPlaceHolder_cboYear')
-        year_selected = year_element.select('[selected]')
-        for years in year_selected:
-            year = years
+    #Initialize web scraper
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    #Get year of event
+    year_element = soup.find(id='mainContentPlaceHolder_cboYear')
+    year_selected = year_element.select('[selected]')
+    for years in year_selected:
+        year = years
     
+    #Get event name
+    event_element = soup.find(id='mainContentPlaceHolder_cboEvents')
+    event_selected = event_element.select('[selected]')
+    for events in event_selected:
+        event = events
     
+    #Get location name
+    location = soup.find(id='mainContentPlaceHolder_lblLocation').text
+    
+    #Extract dates
+    parent_elements = soup.find_all(id in 'mainContentPlaceholder_rptScores_lblFixtureDate_')
+    
+
+    
+
 
 
 def main():
@@ -55,8 +72,8 @@ def main():
     years = ['1','2','3','4','5','6']
     categories = ['2','3','4','5']
     URLs = getLinks('https://clickondarts.com/DartsStats.aspx',years,categories)
-    df = getData(URLs)
 
+    getData(URLs[0]).head()
 
 if __name__ == "__main__":
     main()
