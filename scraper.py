@@ -47,6 +47,7 @@ def date(dataList):
     'May','June','July','August','September',
     'October','November','December'])
     matchDates = []
+    numMatches = []
     prevIndex = 0
     rounds = 1
     for i in range(len(dataList)):
@@ -56,13 +57,22 @@ def date(dataList):
         if not months.isdisjoint(set(splitString)):
             nMatches = (i - prevIndex - rounds)
             dates = [dataList[i]] * nMatches
+            numMatches += [nMatches]
             matchDates += dates
             prevIndex = i
             rounds = 1
     matchDates.reverse()
     dataList.reverse()
-    return matchDates
-    
+    numMatches.reverse()
+    return matchDates,numMatches
+
+def deleteDatesAndRounds(data,dates):
+    rounds = ['Final','Semi','Quarter','Round 6','Round 5','Round 4','Round 3','Round 2','Round 1','Qual']
+    data = [item for item in data if item not in dates]
+    data = [item for item in data if item not in rounds]    
+    return data
+
+
 #Use web scraper to get dataframe with matches and results
 #Perhaps use previous winners?
 def getData(URL):
@@ -104,7 +114,8 @@ def getData(URL):
     index = next((i for i, s in enumerate(text) if 'YearWinnerRunner-Up' in s), None)
     text = text[:index-1]
 
-    dates = date(text)
+    dates,numMatches = date(text)
+    text = deleteDatesAndRounds(text,dates)
     
 
 
